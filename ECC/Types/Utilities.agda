@@ -3,6 +3,7 @@ module ECC.Types.Utilities where
 open import ECC.Types.Basic
 
 infixl 0 _∋_
+infixr 2 _➘_ _≥➘_
 
 _∋_ : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧ -> ᵀ⟦ A ⟧ᵂ
 _∋_ = tagWith {B = ᵀ⟦_⟧}
@@ -68,7 +69,6 @@ inhabit (Lift A)       = inhabit A
 -- we can retag it. I.e. if (le : A' ≤ A) and (x : ≤⟦ le ⟧ᵂ),
 -- then forall (′A), such that (A ≤ ′A), this function constructs such (le'), that
 -- (le' : A' ≤ ′A), (≤⌈ x ⌉ : ≤⟦ le' ⟧ᵂ) and el x ≡ el ≤⌈ x ⌉.
--- (Check this for the (ᵀΣ) and (Lift) cases.)
 ≤⌈_⌉ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A} -> (x : ≤⟦ le ⟧ᵂ) -> ⌈ ≤⟦_⟧ᵂ / x ⌉ᵀ
 ≤⌈_⌉ {A = A} (tag x) = go tag A x where
   go : ∀ {α' α} {A' : Type α'}
@@ -97,3 +97,7 @@ private
   example : ≤⌈ tagWith (Π≤Π {A = ᵀℕ} λ _ -> ᵀ≤ᵀ {α = 3}) (λ _ -> type 0) ⌉
           ≡    tagWith (Π≤Π {A = ᵀℕ} λ _ -> ᵀ≤ᵀ {α = 5}) (λ _ -> type 0)
   example = refl
+
+  counter : ≤⌈ tagWith (Π≤Π {A = type 0} λ _ -> ᵀ≤ᵀ {α = 3}) id ⌉
+          ≡    tagWith (Π≤Π {A = type 0} λ _ -> ᵀ≤ᵀ {α = 5}) (λ _ -> prop)
+  counter = refl

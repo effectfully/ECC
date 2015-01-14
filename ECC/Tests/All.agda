@@ -6,5 +6,4 @@ open import ECC.Tests.Props
 open import ECC.Tests.UniversePolymorphism
 open import ECC.Tests.FromExplicitSubtyping
 open import ECC.Tests.Comp
-open import ECC.Tests.Counter-examples
 open import ECC.Tests.Fails

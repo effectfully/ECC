@@ -15,7 +15,14 @@ open Tag public
 tagWith : ∀ {α β} {A : Set α} {B : (x : A) -> Set β} -> (x : A) -> B x -> Tag B x
 tagWith _ = tag
 
--- Looks like it's not as general as it could be. What's missing?
+uncurryᵂ : ∀ {α β γ} {A : Set α} {B : A -> Set β} {C : ∀ {x} -> B x -> Set γ} {x : A}
+         -> ((x : A) -> (y : B x) -> C y) -> (ty : Tag B x) -> C (el ty)
+uncurryᵂ g (tag y) = g _ y
+
 _<ᵂ>_ : ∀ {α β γ} {A : Set α} {B : A -> Set β} {C : ∀ {x} -> B x -> Set γ} {x : A}
       -> (f : ∀ {x} -> (y : B x) -> C y) -> (ty : Tag B x) -> Tag C (el ty)
-f <ᵂ> tag x = tag (f x)
+g <ᵂ> tag y = tag (g y)
+
+reduceTag : ∀ {α β γ} {A : Set α} {B : (x : A) -> Set β} {C : ∀ {x} -> B x -> Set γ} {x : A}
+          -> (f : (x : A) -> B x) -> Tag (λ x -> C (f x)) x -> Tag C (f x)
+reduceTag f (tag x) = tag x
