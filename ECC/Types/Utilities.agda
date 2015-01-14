@@ -5,8 +5,9 @@ open import ECC.Types.Basic
 infixl 0 _∋_
 infixr 2 _➘_ _≥➘_
 
-_∋_ : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧ -> ᵀ⟦ A ⟧ᵂ
-_∋_ = tagWith {B = ᵀ⟦_⟧}
+-- Additional wrapping to prevent silly using.
+_∋_ : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧ -> Wrap ᵀ⟦ A ⟧ᵂ
+A ∋ x = wrap (tagWith A x)
 
 propᵂ = type 0 ∋ prop
 unitᵂ = prop   ∋ unit
@@ -15,11 +16,15 @@ unitᵂ = prop   ∋ unit
 typeᵂ : ∀ α -> _
 typeᵂ α = type (suc α) ∋ type α
 
-_➘_  : ∀ {α β} {B : Type β} -> (A : Type α) -> ᵀ⟦ B ⟧ᵂ -> ᵀ⟦ A  ⟶ B ⟧ᵂ
-A  ➘ tag y = A  ⟶ _ ∋ λ _ -> y
+_➘_  : ∀ {α β} {B : Type β} -> (A : Type α) -> Wrap ᵀ⟦ B ⟧ᵂ -> Wrap ᵀ⟦ A  ⟶ B ⟧ᵂ
+A  ➘ wrap (tag y) = A  ⟶ _ ∋ λ _ -> y
 
-_≥➘_ : ∀ {α β} {B : Type β} -> (A : Type α) -> ᵀ⟦ B ⟧ᵂ -> ᵀ⟦ A ≥⟶ B ⟧ᵂ
-A ≥➘ tag y = A ≥⟶ _ ∋ λ _ -> y
+_≥➘_ : ∀ {α β} {B : Type β} -> (A : Type α) -> Wrap ᵀ⟦ B ⟧ᵂ -> Wrap ᵀ⟦ A ≥⟶ B ⟧ᵂ
+A ≥➘ wrap (tag y) = A ≥⟶ _ ∋ λ _ -> y
+
+-- This retagging is annoying. Is it possible to avoid it?
+ᵀ-to-≤ : ∀ {α} {A : Type α} -> ᵀ⟦ A ⟧ᵂ -> ≤⟦ ≤-refl A ⟧ᵂ
+ᵀ-to-≤ (tag x) = tag x
 
 inhabit-type : ∀ α -> Type α
 inhabit-type (ᴺ 0)       = prop
@@ -44,6 +49,7 @@ inhabit (Lift A)       = inhabit A
 ≤-type-trans {′α = ′α}    (p≤ᵀ {α})           α≤′α = p≤ᵀ {′α}
 ≤-type-trans {ᴺ (suc α')} (ᵀ≤ᵀ {α'≤α = α'≤α}) α≤′α = ᵀ≤ᵀ {α'≤α = ≤ℕ-trans α' α'≤α α≤′α}
 
+-- An auxiliary function breaks unification somehow.
 ⌈_/_⌉ᵀ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
        -> (∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set) -> ≤⟦ le ⟧ᵂ -> Set
 ⌈_/_⌉ᵀ {A = prop  }      Cont _ = Cont p≤p
@@ -87,9 +93,10 @@ inhabit (Lift A)       = inhabit A
   go cont (ᵀΣ A B) p = go (λ x -> cont (proj₁ p         , x)) (B _) _
   go cont (Lift A) x = go cont A x
 
--- This retagging is annoying. Is it avoidable?
-⌈_⌉ : ∀ {α'} {A' : Type α'} -> (x : ᵀ⟦ A' ⟧ᵂ) -> ⌈ ≤⟦_⟧ᵂ / tagWith (≤-refl A') (el x) ⌉ᵀ
-⌈_⌉ {A' = A'} x = ≤⌈ tagWith (≤-refl A') (el x) ⌉
+-- This function ought to be called only on constants like (ᵀℕᵂ)
+-- combined by functions like (_➘_)
+⌈_⌉ : ∀ {α'} {A' : Type α'} -> (x : Wrap ᵀ⟦ A' ⟧ᵂ) -> ⌈ ≤⟦_⟧ᵂ / ᵀ-to-≤ (unwrap x) ⌉ᵀ
+⌈ x ⌉ = ≤⌈ ᵀ-to-≤ (unwrap x) ⌉
 
 private
   open import Relation.Binary.PropositionalEquality

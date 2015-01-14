@@ -5,7 +5,7 @@ open import ECC.Main
 ᵀtest-1 : Typeᴺ 2
 ᵀtest-1 = (type 1 ≥⟶ type 1)
           ≥Π λ B -> type 0 
-          ᵂΠ λ A -> el B ⌈ A ⌉
+          ᵂΠ λ A -> el B ᵀ⌈ A ⌉
 
 ᵀtest-2 : Typeᴺ 2
 ᵀtest-2 = (type 1 ≥Π λ A -> el A ⟶ type 1)
@@ -36,46 +36,31 @@ test-3 = ≥⇧ λ B -> ⇧ λ f -> ⇧ λ x -> ↑ f · ↑ x
           ≥Π λ B -> el B (type 1) (type 0)
 
 ᵀtest-7 : Typeᴺ 2
-ᵀtest-7 = ((type 1 ⟶ type 1) ≥⟶ type 1)
-          Π λ B -> (type 1 ⟶ type 0)
-         ᵂΠ λ C -> B ⌈ C ⌉
-
-ᵀtest-8 : Typeᴺ 2
-ᵀtest-8 = ((type 1 ≥⟶ type 1) ≥⟶ type 1)
-          Π λ B -> (type 1 ≥⟶ type 0)
-         ᵂΠ λ C -> B ⌈ C ⌉
-
--- _π_ : ∀ {α β}
---     -> (A : Type α) {B : ᵀ⟦ A ⟧ -> Type β}
---     -> ((x : ᵀ⟦ A ⟧) -> ᵀ⟦ B x ⟧ᵂ)
---     -> ᵀ⟦ A Π B ⟧ᵂ
-
-ᵀtest-9 : Typeᴺ 2
-ᵀtest-9 = (ᵀℕ ⟶ type 1)
+ᵀtest-7 = (ᵀℕ ⟶ type 1)
           ≥Π λ B -> (ᵀℕ Π el B)
            Π λ f -> el B 0
 
-test-9 : Term ᵀtest-9
-test-9 = ≥⇧ λ B -> ⇧ λ f -> ↑ f · plain 0
+test-7 : Term ᵀtest-7
+test-7 = ≥⇧ λ B -> ⇧ λ f -> ↑ f · plain 0
 
-ᵀtest-10 : ᵀProp
-ᵀtest-10 = (type 0 Π id) ≥Π λ B -> el B prop ⟶ el B prop
+ᵀtest-8 : ᵀProp
+ᵀtest-8 = (type 0 Π id) ≥Π λ B -> el B prop ⟶ el B prop
 
-test-10 : Term ᵀtest-10
-test-10 = ≥⇧ λ B -> ⇧ λ x -> ↑ x
+test-8 : Term ᵀtest-8
+test-8 = ≥⇧ λ B -> ⇧ λ x -> ↑ x
 
-test-11 : Term _
-test-11 = test-10 ≥· tagWith (≤-refl (type 0 Π id)) inhabit
+test-9 : Term _
+test-9 = test-8 ≥· tagWith (≤-refl (type 0 Π id)) inhabit
 
-test-12 : Term _
-test-12 = test-10 ≥· tagWith (Π≤Π ≤-refl) inhabit
+test-10 : Term _
+test-10 = test-8 ≥· tagWith (Π≤Π ≤-refl) inhabit
 
-ᵀtest-13 : Typeᴺ 2
-ᵀtest-13 = (type 1 ≥⟶ type 1)
+ᵀtest-11 : Typeᴺ 2
+ᵀtest-11 = (type 1 ≥⟶ type 1)
            Π λ p -> type 1
           ≥Π λ c -> p c
 
-ᵀtest-14 : Typeᴺ 2
-ᵀtest-14 = (type 1 ≥⟶ type 1)
+ᵀtest-12 : Typeᴺ 2
+ᵀtest-12 = (type 1 ≥⟶ type 1)
            Π λ p -> type 0
           ≥Π λ c -> p ≤⌈ c ⌉

@@ -11,7 +11,7 @@ open import ECC.Main
           Π λ g -> b
 
 test-1 : Term ᵀtest-1
-test-1 = ⇧ λ a -> ⇧ λ b -> ⇧ λ f -> ⇧ λ g -> ↑ f · (↑ g ≥· ⌈ a ⌉ {_})
+test-1 = ⇧ λ a -> ⇧ λ b -> ⇧ λ f -> ⇧ λ g -> ↑ f · (↑ g ≥· ᵀ⌈ a ⌉ {_})
  
 ᵀtest-1' : Typeᴺ 2
 ᵀtest-1' = type 0

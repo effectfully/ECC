@@ -97,13 +97,14 @@ last-level  _       = 0
 -- however it doesn't allow you to change the meaning of the value.
 -- All (Π≤Π) tags become (ℓΠ≤ℓΠ), which is annoying, but I have no idea, how to fix this.
 ≤⌈_⌉ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
-     -> (x : ≤⟦ le ⟧ᵂ)
-     -> ∀ {′α} {≤′α : last-level A ≤ℕᵂ ′α} -> ≤⟦ generalize x ≤′α ⟧ᵂ
+     -> (x : ≤⟦ le ⟧ᵂ) {′α : ℕ} {≤′α : last-level A ≤ℕᵂ ′α}
+     -> ≤⟦ generalize x ≤′α ⟧ᵂ
 ≤⌈_⌉ x {≤′α = ≤′α} = tagWith (generalize x ≤′α) (uncurryᵂ go x ≤′α) where
   go : ∀ {α' α} {A' : Type α'} {A : Type α}
      -> (le : A' ≤ A)
-     -> (x : ≤⟦ le ⟧)
-     -> ∀ {′α ′′α} -> (′α≤′′α : ′α ≤ℕᵂ ′′α) -> ≤⟦ generalize (tagWith le x) ′α≤′′α ⟧
+     -> (x : ≤⟦ le ⟧) {′α ′′α : ℕ} 
+     -> (′α≤′′α : ′α ≤ℕᵂ ′′α)
+     -> ≤⟦ generalize (tagWith le x) ′α≤′′α ⟧
   go {A = prop  } le A      ′α≤′′α = A
   go {A = unit  } le _      ′α≤′′α = _
   go {A = ᵀℕ    } le n      ′α≤′′α = n
@@ -115,6 +116,11 @@ last-level  _       = 0
   go {A = A ≥Π B} le f      ′α≤′′α = λ x -> go (le ≥Π· tag x) (f (tag x)) ′α≤′′α
   go {A = ᵀΣ A B} le p      ′α≤′′α = proj₁ p , go (le Σ· proj₁ p) (proj₂ p) ′α≤′′α
   go {A = Lift A} le x             = go (unL≤L le) x
+
+ᵀ⌈_⌉ : ∀ {α'} {A' : Type α'}
+     -> (x : ᵀ⟦ A' ⟧ᵂ) {′α : ℕ} {≤′α : last-level A' ≤ℕᵂ ′α} 
+     -> ≤⟦ generalize (ᵀ-to-≤ x) ≤′α ⟧ᵂ
+ᵀ⌈ x ⌉ {≤′α = ≤′α} = ≤⌈ ᵀ-to-≤ x ⌉ {≤′α = ≤′α}
 
 private
   example : ≤⌈ tagWith ( Π≤Π  {A = type 0} λ _ -> ᵀ≤ᵀ {α = 3}) id ⌉
