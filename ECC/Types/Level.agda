@@ -2,12 +2,14 @@ module ECC.Types.Level where
 
 open import ECC.Utilities
 
+open import Relation.Binary.PropositionalEquality
 open import Data.Empty
 open import Data.Unit
 open import Data.Nat hiding (module _≤_; _≤_) renaming (_⊔_ to _⊔ℕ_) public
 open import Data.Product
 
-infix 4 _≤ℕ_ _≤ℓᵂ_
+infix 4 _≤ℕ_ _≤ℕᵂ_
+infixl 6 _⊔ℕᵢ_ _⊔̂ℕᵢ_ _⊔ᵢ_ _⊔_
 
 -- If (n ∸ m) is in canonical form,
 -- then (n ≤ℕ m) reduces either to (⊤) or to (⊥).
@@ -29,42 +31,44 @@ suc n ≤ℕ suc m = n ≤ℕ m
 ≤ℕ-trans (suc n) {suc m} {zero } n≤m ()
 ≤ℕ-trans (suc n) {suc m} {suc p} n≤m m≤p = ≤ℕ-trans n n≤m m≤p 
 
-⊔-≤ℕ : ∀ n {m p} -> n ≤ℕ p -> m ≤ℕ p -> n ⊔ℕ m ≤ℕ p
-⊔-≤ℕ  0      {m    } {p    } n≤m m≤p = m≤p
-⊔-≤ℕ (suc _) {0    } {p    } n≤m m≤p = n≤m
-⊔-≤ℕ (suc n) {suc m} {0    } n≤m ()
-⊔-≤ℕ (suc n) {suc m} {suc p} n≤m m≤p = ⊔-≤ℕ n n≤m m≤p
+⊔ℕ-≤ℕ : ∀ n {m p} -> n ≤ℕ p -> m ≤ℕ p -> n ⊔ℕ m ≤ℕ p
+⊔ℕ-≤ℕ  0      {m    } {p    } n≤m m≤p = m≤p
+⊔ℕ-≤ℕ (suc _) {0    } {p    } n≤m m≤p = n≤m
+⊔ℕ-≤ℕ (suc n) {suc m} {0    } n≤m ()
+⊔ℕ-≤ℕ (suc n) {suc m} {suc p} n≤m m≤p = ⊔ℕ-≤ℕ n n≤m m≤p
 
-data level : Set where
-  -1 : level
-  ᴺ  : ℕ -> level
-  ω  : level
+_⊔ℕᵢ_ : ℕ -> ℕ -> ℕ
+n ⊔ℕᵢ 0 = 0
+n ⊔ℕᵢ m = n ⊔ℕ m
 
-predᴺ : level -> level
-predᴺ (ᴺ  0)      = -1
-predᴺ (ᴺ (suc α)) = ᴺ α
-predᴺ α = α -- This case doesn't appear in the code.
-
-_⊔ᵢ_ : level -> level -> level
-α   ⊔ᵢ -1  = -1
--1  ⊔ᵢ β   = β
-ᴺ α ⊔ᵢ ᴺ β = ᴺ (α ⊔ℕ β)
-_   ⊔ᵢ _   = ω
-
-_⊔_ : level -> level -> level
-α   ⊔ -1  = α
--1  ⊔ β   = β
-ᴺ α ⊔ ᴺ β = ᴺ (α ⊔ℕ β)
-_   ⊔ _   = ω
-
-_≤ℓ_ : level -> level -> Set
--1  ≤ℓ _   = ⊤
-ᴺ α ≤ℓ ᴺ β = α ≤ℕ β
-_   ≤ℓ ω   = ⊤
-_   ≤ℓ _   = ⊥
+⊔ℕᵢ-≤ℕ : ∀ n {m p} -> n ≤ℕ p -> m ≤ℕ p -> n ⊔ℕᵢ m ≤ℕ p
+⊔ℕᵢ-≤ℕ n {0}     {p} n≤m m≤p = _
+⊔ℕᵢ-≤ℕ n {suc m} {p} n≤m m≤p = ⊔ℕ-≤ℕ n n≤m m≤p
 
 _≤ℕᵂ_ : ℕ -> ℕ -> Set
 n ≤ℕᵂ m = Tag (uncurry _≤ℕ_) (n , m)
 
-_≤ℓᵂ_ : level -> level -> Set
-α ≤ℓᵂ β = Tag (uncurry _≤ℓ_) (α , β)
+_⊔̂ℕᵢ_ : ∀ {n m p} -> n ≤ℕᵂ p -> m ≤ℕᵂ p -> n ⊔ℕᵢ m ≤ℕᵂ p
+_⊔̂ℕᵢ_ {n} {m} (tag n≤p) (tag m≤p) = tag (⊔ℕᵢ-≤ℕ n {m} n≤p m≤p)
+
+data level : Set where
+  # : ℕ -> level
+  ω : level
+
+pred# : level -> ℕ
+pred# (# n) = pred n
+pred#  ω    = 0
+
+_⊔ᵢ_ : level -> level -> level
+# n ⊔ᵢ # m = # (n ⊔ℕᵢ m)
+# 0 ⊔ᵢ β   = β
+_   ⊔ᵢ _   = ω
+
+_⊔_ : level -> level -> level
+# n ⊔ # m = # (n ⊔ℕ m)
+_   ⊔ _   = ω
+
+_≤ℓ_ : level -> level -> Set
+# α ≤ℓ # β = α ≤ℕ β
+_   ≤ℓ ω   = ⊤
+ω   ≤ℓ _   = ⊥

@@ -9,34 +9,36 @@ open import Relation.Binary.PropositionalEquality
 generalizeᴸ-left : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> level
 generalizeᴸ-left = uncurryᵂ go where
   go : ∀ {α' α} {A' : Type α'} {A : Type α} -> (le : A' ≤ A) -> ≤⟦ le ⟧ -> level
-  go     {A = _  Π _    } le _ = ω
-  go     {A = _ ℓΠ _    } le _ = ω
-  go     {A = _ ≥Π _    } le _ = ω
-  go     {A = ᵀΣ {α} A B} le p = α ⊔ go (le Σ· proj₁ p) (proj₂ p)
-  go     {A = Lift A    } le x = go (unL≤L le) x
-  go {α'}                 le x = α'
+  go {α'} {A = unit      } le _ = α'
+  go {α'} {A = ᵀℕ        } le _ = α'
+  go {α'} {A = type _    } le _ = α'
+  go      {A = _  Π _    } le _ = ω
+  go      {A = _ ℓΠ _    } le _ = ω
+  go      {A = _ ≥Π _    } le _ = ω
+  go      {A = ᵀΣ {α} A B} le p = α ⊔ go (le Σ· proj₁ p) (proj₂ p)
+  go      {A = Lift A    } le x = go (unL≤L le) x
 
 generalizeᴸ-right : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
                   -> ≤⟦ le ⟧ᵂ -> ℕ -> ℕ -> level
 generalizeᴸ-right x ′α ′′α = uncurryᵂ go x where
   go : ∀ {α' α} {A' : Type α'} {A : Type α}
      -> (le : A' ≤ A) -> ≤⟦ le ⟧ -> level
-  go        {A = type α    } le   _ with α | α ≟ ′α
-  ... | ._ | yes refl = ᴺ (suc ′′α)
-  ... | α' | no  _    = ᴺ (suc α')
-  go        {A = A  Π B    } le   _ = ω
-  go        {A = A ℓΠ B    } le   _ = ω
-  go        {A = A ≥Π B    } le   _ = ω
-  go        {A = ᵀΣ {α} A B} le p = α ⊔ go (le Σ· proj₁ p) (proj₂ p)
-  go        {A = Lift A    } le x = go (unL≤L le) x
-  go {α = α}                 le _ = α
+  go         {A = unit      } le _ = # 0
+  go         {A = ᵀℕ        } le _ = # 1
+  go         {A = type α    } le _ with α | α ≟ ′α
+  ... | ._ | yes refl = # (suc ′′α)
+  ... | α' | no  _    = # (suc α')
+  go         {A = A  Π B    } le _ = ω
+  go         {A = A ℓΠ B    } le _ = ω
+  go         {A = A ≥Π B    } le _ = ω
+  go         {A = ᵀΣ {α} A B} le p = α ⊔ go (le Σ· proj₁ p) (proj₂ p)
+  go         {A = Lift A    } le x = go (unL≤L le) x
 
 generalizeᵀ-left : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
                  -> (x : ≤⟦ le ⟧ᵂ) -> Type (generalizeᴸ-left x)
 generalizeᵀ-left = uncurryᵂ go where
   go : ∀ {α' α} {A' : Type α'} {A : Type α}
      -> (le : A' ≤ A) -> (x : ≤⟦ le ⟧) -> Type (generalizeᴸ-left (tagWith le x))
-  go {A' = A'} {prop  } le _ = A'
   go {A' = A'} {unit  } le _ = A'
   go {A' = A'} {ᵀℕ    } le _ = A'
   go {A' = A'} {type α} le _ = A'
@@ -51,7 +53,6 @@ generalizeᵀ-right : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
 generalizeᵀ-right x ′α ′′α = uncurryᵂ go x where
   go : ∀ {α' α} {A' : Type α'} {A : Type α}
      -> (le : A' ≤ A) -> (x : ≤⟦ le ⟧) -> Type (generalizeᴸ-right (tagWith le x) ′α ′′α)
-  go {A = prop  } le _ = prop
   go {A = unit  } le _ = unit
   go {A = ᵀℕ    } le _ = ᵀℕ
   go {A = type α} le _ with α | α ≟ ′α
@@ -72,7 +73,6 @@ generalize {′α = ′α} {′′α} x ′α≤′′α = uncurryᵂ go x where
      -> (le : A' ≤ A)
      -> (x : ≤⟦ le ⟧)
      -> generalizeᵀ-left (tagWith le x) ≤ generalizeᵀ-right (tagWith le x) ′α ′′α
-  go {A = prop  } le _ = le
   go {A = unit  } le _ = le
   go {A = ᵀℕ    } le _ = le
   go {A = type α} le _ with α | α ≟ ′α
@@ -105,7 +105,6 @@ last-level  _       = 0
      -> (x : ≤⟦ le ⟧) {′α ′′α : ℕ} 
      -> (′α≤′′α : ′α ≤ℕᵂ ′′α)
      -> ≤⟦ generalize (tagWith le x) ′α≤′′α ⟧
-  go {A = prop  } le A      ′α≤′′α = A
   go {A = unit  } le _      ′α≤′′α = _
   go {A = ᵀℕ    } le n      ′α≤′′α = n
   go {A = type α} le A {′α} ′α≤′′α with α | α ≟ ′α
@@ -117,10 +116,10 @@ last-level  _       = 0
   go {A = ᵀΣ A B} le p      ′α≤′′α = proj₁ p , go (le Σ· proj₁ p) (proj₂ p) ′α≤′′α
   go {A = Lift A} le x             = go (unL≤L le) x
 
-ᵀ⌈_⌉ : ∀ {α'} {A' : Type α'}
-     -> (x : ᵀ⟦ A' ⟧ᵂ) {′α : ℕ} {≤′α : last-level A' ≤ℕᵂ ′α} 
-     -> ≤⟦ generalize (ᵀ-to-≤ x) ≤′α ⟧ᵂ
-ᵀ⌈ x ⌉ {≤′α = ≤′α} = ≤⌈ ᵀ-to-≤ x ⌉ {≤′α = ≤′α}
+-- ᵀ⌈_⌉ : ∀ {α' α} {A' : Type α'}
+--      -> (x : ᵀ⟦ A' ⟧ᵂ) {≤α : last-level A' ≤ℕᵂ α} 
+--      -> ≤⟦ generalize (ᵀ-to-≤ x) ≤α ⟧ᵂ
+-- ᵀ⌈_⌉ {A' = A'} x {≤α} = ≤⌈ ᵀ-to-≤ x ⌉ {≤′α = ≤α}
 
 private
   example : ≤⌈ tagWith ( Π≤Π  {A = type 0} λ _ -> ᵀ≤ᵀ {α = 3}) id ⌉

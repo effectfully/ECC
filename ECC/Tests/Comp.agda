@@ -1,7 +1,7 @@
 module ECC.Tests.Comp where
 -- Untested.
 
-open import ECC.Main
+open import ECC.Main hiding (Type) renaming (AnyType to Type)
 
 import Level as Le
 open import Data.Unit

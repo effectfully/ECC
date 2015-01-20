@@ -21,8 +21,3 @@ uncurryᵂ g (tag y) = g _ y
 _<ᵂ>_ : ∀ {α β γ} {A : Set α} {B : A -> Set β} {C : ∀ {x} -> B x -> Set γ} {x : A}
       -> (f : ∀ {x} -> (y : B x) -> C y) -> (ty : Tag B x) -> Tag C (el ty)
 g <ᵂ> tag y = tag (g y)
-
-record Wrap {α} (A : Set α) : Set α where
-  constructor wrap
-  field unwrap : A
-open Wrap public

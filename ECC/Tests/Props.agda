@@ -3,16 +3,16 @@ module ECC.Tests.Props where
 
 open import ECC.Main
 
-ᵀ⊥ : ᵀProp
+ᵀ⊥ : Propᵀ
 ᵀ⊥ = prop Π id
 
-ᵀ¬ : ᵀProp -> ᵀProp
+ᵀ¬ : Propᵀ -> Propᵀ
 ᵀ¬ P = P ⟶ ᵀ⊥
 
-ᵀ∃ : ∀ {α} (A : Type α) (P : ᵀ⟦ A ⟧ -> ᵀProp) -> ᵀProp
+ᵀ∃ : ∀ {α} (A : Type α) (P : ᵀ⟦ A ⟧ -> Propᵀ) -> Propᵀ
 ᵀ∃ A P = prop Π λ R -> (A Π λ x -> P x ⟶ R) ⟶ R
 
-_∧_ : ᵀProp -> ᵀProp -> ᵀProp
+_∧_ : Propᵀ -> Propᵀ -> Propᵀ
 P ∧ Q = prop Π λ R -> (P ⟶ Q ⟶ R) ⟶ R
 
 fst-∧ : Term (prop Π λ P -> prop Π λ Q -> P ∧ Q ⟶ P)
@@ -27,7 +27,7 @@ fst-∧ = ⇧ λ P -> ⇧ λ Q -> ⇧ λ F -> ↑ F · ↑ P · plain const
 ex : Term ᵀex
 ex = ⇧ λ α -> ⇧ λ A -> ⇧ λ P -> ⇧ λ x -> ⇧ λ p -> ⇧ λ R -> ⇧ λ f -> ↑ f · ↑ x · ↑ p
 
-ᵀ¬-∃ : ᵀProp
+ᵀ¬-∃ : Propᵀ
 ᵀ¬-∃ = ᵀℕ
      Π λ α -> type α
      Π λ A -> (A ⟶ prop)

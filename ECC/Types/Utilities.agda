@@ -3,40 +3,42 @@ module ECC.Types.Utilities where
 open import ECC.Types.Basic
 
 infixl 0 _∋_
-infixr 2 _➘_ _≥➘_
+infixr 2 _⟶̃_ _➘_ _≥➘_
 
--- Additional wrapping to prevent silly using.
-_∋_ : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧ -> Wrap ᵀ⟦ A ⟧ᵂ
-A ∋ x = wrap (tagWith A x)
+ℓe : ∀ {α' α} {A' : Type α'} {le : A' ≤ type α} -> ≤⟦ le ⟧ᵂ -> pred# α' ≤ℕᵂ α
+ℓe {le = ᵀ≤ᵀ {α'≤α = α'≤α}} _ = tag α'≤α
 
-propᵂ = type 0 ∋ prop
-unitᵂ = prop   ∋ unit
-ᵀℕᵂ   = type 0 ∋ ᵀℕ
+ᵀ⌈_⌉ : ∀ {α' α} -> Type# α' -> {α'≤α : α' ≤ℕᵂ α} -> ≤⟦ ᵀ≤ᵀ {α'≤α = el α'≤α} ⟧ᵂ
+ᵀ⌈ A ⌉ = tagWith ᵀ≤ᵀ A
 
-typeᵂ : ∀ α -> _
-typeᵂ α = type (suc α) ∋ type α
+-- Is it too specific? What about (Π̃)?
+_⟶̃_  : ∀ {α' β' γ} {A' : Type α'} {B' : Type β'}
+          {A'le : A' ≤ type γ} {B'le : B' ≤ type γ}
+      -> (A : ≤⟦ A'le ⟧ᵂ) -> (B : ≤⟦ B'le ⟧ᵂ) -> ≤⟦ ᵀ≤ᵀ {α'≤α = el (ℓe A ⊔̂ℕᵢ ℓe B)} ⟧ᵂ
+A  ⟶̃ B = ᵀ⌈ el A  ⟶ el B ⌉
 
-_➘_  : ∀ {α β} {B : Type β} -> (A : Type α) -> Wrap ᵀ⟦ B ⟧ᵂ -> Wrap ᵀ⟦ A  ⟶ B ⟧ᵂ
-A  ➘ wrap (tag y) = A  ⟶ _ ∋ λ _ -> y
+_≥⟶̃_ : ∀ {α' β' γ} {A' : Type α'} {B' : Type β'}
+          {A'le : A' ≤ type γ} {B'le : B' ≤ type γ}
+      -> (A : ≤⟦ A'le ⟧ᵂ) -> (B : ≤⟦ B'le ⟧ᵂ) -> ≤⟦ ᵀ≤ᵀ {α'≤α = el (ℓe A ⊔̂ℕᵢ ℓe B)} ⟧ᵂ
+A ≥⟶̃ B = ᵀ⌈ el A ≥⟶ el B ⌉
 
-_≥➘_ : ∀ {α β} {B : Type β} -> (A : Type α) -> Wrap ᵀ⟦ B ⟧ᵂ -> Wrap ᵀ⟦ A ≥⟶ B ⟧ᵂ
-A ≥➘ wrap (tag y) = A ≥⟶ _ ∋ λ _ -> y
+data _∋_ : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧ -> Set where
+  propᴮ : typeᴺ 0 ∋ prop
+  unitᴮ : prop    ∋ unit
+  ᵀℕᴮ   : typeᴺ 0 ∋ ᵀℕ
+  typeᴮ : ∀ α -> typeᴺ (suc α) ∋ typeᴺ α
+  _➘_  : ∀ {α β} {B : Type β} {y} -> (A : Type α) -> B ∋ y ->  A  ⟶ B ∋ λ _ -> y
+  _≥➘_ : ∀ {α β} {B : Type β} {y} -> (A : Type α) -> B ∋ y ->  A ≥⟶ B ∋ λ _ -> y
+  _,ᴮ_  : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β} -> ∀ x y -> ᵀΣ A B ∋ (x , y)
 
 -- This retagging is annoying. Is it possible to avoid it?
 ᵀ-to-≤ : ∀ {α} {A : Type α} -> ᵀ⟦ A ⟧ᵂ -> ≤⟦ ≤-refl A ⟧ᵂ
 ᵀ-to-≤ (tag x) = tag x
 
-inhabit-type : ∀ α -> Type α
-inhabit-type (ᴺ 0)       = prop
-inhabit-type (ᴺ (suc α)) = type α
-inhabit-type  -1         = unit
-inhabit-type  ω          = ᵀℕ ℓΠ type
-
 inhabit : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧
-inhabit  prop          = unit
 inhabit  unit          = _
 inhabit  ᵀℕ            = 0
-inhabit (type  0     ) = prop
+inhabit (type  0     ) = unit
 inhabit (type (suc α)) = type α
 inhabit (A  Π B)       = λ x -> inhabit (B x)
 inhabit (A ℓΠ B)       = λ x -> inhabit (B x)
@@ -44,18 +46,14 @@ inhabit (A ≥Π B)       = λ x -> inhabit (B x)
 inhabit (ᵀΣ A B)       = let IA = inhabit A in IA , inhabit (B IA)
 inhabit (Lift A)       = inhabit A
 
-≤-type-trans : ∀ {α' α ′α} {A' : Type α'}
-             -> A' ≤ type α -> α ≤ℕ ′α -> A' ≤ type ′α
-≤-type-trans {′α = ′α}    (p≤ᵀ {α})           α≤′α = p≤ᵀ {′α}
-≤-type-trans {ᴺ (suc α')} (ᵀ≤ᵀ {α'≤α = α'≤α}) α≤′α = ᵀ≤ᵀ {α'≤α = ≤ℕ-trans α' α'≤α α≤′α}
+≤-type-trans : ∀ {α' α ′α} {A' : Type α'} -> A' ≤ type α -> α ≤ℕ ′α -> A' ≤ type ′α
+≤-type-trans {# (suc α')} (ᵀ≤ᵀ {α'≤α = α'≤α}) α≤′α = ᵀ≤ᵀ {α'≤α = ≤ℕ-trans α' α'≤α α≤′α}
 
 -- An auxiliary function breaks unification somehow.
 ⌈_/_⌉ᵀ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
        -> (∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set) -> ≤⟦ le ⟧ᵂ -> Set
-⌈_/_⌉ᵀ {A = prop  }      Cont _ = Cont p≤p
 ⌈_/_⌉ᵀ {A = unit  }      Cont _ = Cont ⊤≤⊤
 ⌈_/_⌉ᵀ {A = ᵀℕ    }      Cont _ = Cont ℕ≤ℕ
--- There are two cases: (prop ≤ type α) and (type α' ≤ type α).
 ⌈_/_⌉ᵀ {A = type α} {le} Cont _ = ∀ {′α} {α≤′α : α ≤ℕ ′α} -> Cont (≤-type-trans le α≤′α)
 ⌈_/_⌉ᵀ {A = A  Π B} {le} Cont f = let IA =      inhabit A  in
   ⌈ (λ le' -> Cont ( Π≤Π  {A = A} λ _ -> le')) / tagWith (le  Π· IA) (el f IA) ⌉ᵀ
@@ -74,8 +72,9 @@ inhabit (Lift A)       = inhabit A
 -- When (x) is a tagged value or a tagged function, that ignores ALL its arguments,
 -- we can retag it. I.e. if (le : A' ≤ A) and (x : ≤⟦ le ⟧ᵂ),
 -- then forall (′A), such that (A ≤ ′A), this function constructs such (le'), that
--- (le' : A' ≤ ′A), (≤⌈ x ⌉ : ≤⟦ le' ⟧ᵂ) and el x ≡ el ≤⌈ x ⌉.
-≤⌈_⌉ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A} -> (x : ≤⟦ le ⟧ᵂ) -> ⌈ ≤⟦_⟧ᵂ / x ⌉ᵀ
+-- (le' : A' ≤ ′A), (≤⌈ x ⌉ : ≤⟦ le' ⟧ᵂ) and (el x ≡ el ≤⌈ x ⌉).
+≤⌈_⌉ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
+     -> (x : ≤⟦ le ⟧ᵂ) -> ⌈ ≤⟦_⟧ᵂ / x ⌉ᵀ
 ≤⌈_⌉ {A = A} (tag x) = go tag A x where
   go : ∀ {α' α} {A' : Type α'}
          {Cont : ∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set}
@@ -83,7 +82,6 @@ inhabit (Lift A)       = inhabit A
      -> (A : Type α) {le : A' ≤ A}
      -> (x : ≤⟦ le ⟧) 
      -> ⌈ Cont / tagWith le x ⌉ᵀ
-  go cont  prop    A = cont A
   go cont  unit    _ = cont _
   go cont  ᵀℕ      n = cont n
   go cont (type α) A = cont A
@@ -93,10 +91,8 @@ inhabit (Lift A)       = inhabit A
   go cont (ᵀΣ A B) p = go (λ x -> cont (proj₁ p         , x)) (B _) _
   go cont (Lift A) x = go cont A x
 
--- This function ought to be called only on constants like (ᵀℕᵂ)
--- combined by functions like (_➘_)
-⌈_⌉ : ∀ {α'} {A' : Type α'} -> (x : Wrap ᵀ⟦ A' ⟧ᵂ) -> ⌈ ≤⟦_⟧ᵂ / ᵀ-to-≤ (unwrap x) ⌉ᵀ
-⌈ x ⌉ = ≤⌈ ᵀ-to-≤ (unwrap x) ⌉
+⌈_⌉ : ∀ {α'} {A' : Type α'} {x : ᵀ⟦ A' ⟧} -> A' ∋ x -> ⌈ ≤⟦_⟧ᵂ / tagWith (≤-refl A') x ⌉ᵀ
+⌈_⌉ {A' = A'} {x} _ = ≤⌈ tagWith (≤-refl A') x ⌉
 
 private
   open import Relation.Binary.PropositionalEquality
@@ -105,6 +101,6 @@ private
           ≡    tagWith (Π≤Π {A = ᵀℕ} λ _ -> ᵀ≤ᵀ {α = 5}) (λ _ -> type 0)
   example = refl
 
-  counter : ≤⌈ tagWith (Π≤Π {A = type 0} λ _ -> ᵀ≤ᵀ {α = 3}) id ⌉
-          ≡    tagWith (Π≤Π {A = type 0} λ _ -> ᵀ≤ᵀ {α = 5}) (λ _ -> prop)
+  counter : ≤⌈ tagWith (Π≤Π {A = typeᴺ 0} λ _ -> ᵀ≤ᵀ {α = 3}) id ⌉
+          ≡    tagWith (Π≤Π {A = typeᴺ 0} λ _ -> ᵀ≤ᵀ {α = 5}) (λ _ -> prop)
   counter = refl

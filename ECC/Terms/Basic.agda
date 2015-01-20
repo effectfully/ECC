@@ -1,6 +1,6 @@
 module ECC.Terms.Basic where
 
-open import ECC.Types.Basic public
+open import ECC.Types.Basic
 
 infixl 4 _·_ _ℓ·_ _≥·_
 
@@ -63,8 +63,7 @@ mutual
   ⟦ x ⟰ le  ⟧ = ᵀcoerce ⟦ x ⟧ le
 
 -- Types at the value level.
--- Doesn't handle props (like (unit)). Is there a simple way to fix this?
-↓ : ∀ {α} -> Typeᴺ α -> Term (type α)
+↓ : ∀ {α} -> Type# α -> Term (type α)
 ↓ = ↑ ∘ tag
 
 -- Plain Agda values. Good for types too.

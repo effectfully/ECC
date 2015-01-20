@@ -16,13 +16,16 @@ data _≤_ : ∀ {α' α} -> Type α' -> Type α -> Set
 ≤-refl : ∀ {α} -> (A : Type α) -> A ≤ A
 ≤⟦_⟧ : ∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set
 
+Type# : ℕ -> Set
+Type# = Type ∘ # 
+
 -- (Prop) is reserved.
-ᵀProp : Set
-ᵀProp = Type -1
+Propᵀ : Set
+Propᵀ = Type# 0
 
 -- An analog of (λ α -> Set α).
 Typeᴺ : ℕ -> Set
-Typeᴺ = Type ∘ ᴺ
+Typeᴺ = Type# ∘ suc
 
 -- An analog of (Setω).
 Typeω : Set
@@ -31,6 +34,7 @@ Typeω = Type ω
 ᵀ⟦_⟧ : ∀ {α} -> Type α -> Set
 ᵀ⟦ A ⟧ = ≤⟦ ≤-refl A ⟧
 
+-- (ᵀ⟦_⟧ᵂ = ≤⟦_⟧ᵂ ∘ ≤-refl)?
 ᵀ⟦_⟧ᵂ : ∀ {α} -> Type α -> Set
 ᵀ⟦_⟧ᵂ = Tag ᵀ⟦_⟧
 
@@ -38,12 +42,10 @@ Typeω = Type ω
 ≤⟦_⟧ᵂ = Tag ≤⟦_⟧
 
 data Type where
-  -- An impredicative universe.
-  prop : Typeᴺ 0
-  unit : ᵀProp
+  unit : Propᵀ
   ᵀℕ : Typeᴺ 0
   -- A predicative hierarchy of universes.
-  type : ∀ α -> Typeᴺ (suc α)
+  type : ∀ α -> Type# (suc α)
   -- Induction-recursion as usual.
   _Π_ : ∀ {α β} -> (A : Type α) -> (ᵀ⟦ A ⟧ -> Type β) -> Type (α ⊔ᵢ β)
   -- Just like in Agda, e.g. ((∀ α -> Set α) : Setω).
@@ -57,6 +59,12 @@ data Type where
   ᵀΣ : ∀ {α β} -> (A : Type α) -> (ᵀ⟦ A ⟧ -> Type β) -> Type (α ⊔ β)
   Lift : ∀ {α' α} {α'≤α : α' ≤ℓ α} -> Type α' -> Type α
 
+prop : Typeᴺ 0
+prop = type 0
+
+typeᴺ : ∀ α -> Typeᴺ (suc α)
+typeᴺ = type ∘ suc 
+
 _⟶_  : ∀ {α β} -> Type α -> Type β -> Type (α ⊔ᵢ β)
 A  ⟶ B = A  Π λ _ -> B
 
@@ -68,8 +76,6 @@ A ᵂΠ B = A Π B ∘ tag
 
 -- Πs are covariant only
 data _≤_ where
-  p≤p : prop ≤ prop
-  p≤ᵀ : ∀ {α} -> prop ≤ type α
   ⊤≤⊤ : unit ≤ unit
   ℕ≤ℕ : ᵀℕ ≤ ᵀℕ
   ᵀ≤ᵀ : ∀ {α' α} {α'≤α : α' ≤ℕ α} -> type α' ≤ type α
@@ -96,7 +102,6 @@ data _≤_ where
   L≤L : ∀ {α' α ′α} {α'≤′α : α' ≤ℓ ′α} {α≤′α : α ≤ℓ ′α} {A' : Type α'} {A : Type α}
       -> A' ≤ A -> Lift {α = ′α} {α'≤′α} A' ≤ Lift {α = ′α} {α≤′α} A
 
-≤-refl  prop    = p≤p
 ≤-refl  unit    = ⊤≤⊤
 ≤-refl  ᵀℕ      = ℕ≤ℕ
 ≤-refl (type α) = ᵀ≤ᵀ {α'≤α = ≤ℕ-refl α}
@@ -174,7 +179,6 @@ unL≤L : ∀ {lα' α ′α} {α≤′α : α ≤ℓ ′α} {LA' : Type lα'} {
       -> (le-L : LA' ≤ Lift {α = ′α} {α≤′α} A) -> proj₂ (L≤L-∃ le-L) ≤ A
 unL≤L (L≤L le) = le
 
-≤⟦_⟧      {A = prop}   _     = ᵀProp
 ≤⟦_⟧      {A = unit}    _    = ⊤
 ≤⟦_⟧      {A = ᵀℕ}     _     = ℕ
 -- (A' : Type α'), (A' ≤ type α)
@@ -182,7 +186,7 @@ unL≤L (L≤L le) = le
 -- If (A' ≡ type α''), then the result is (Type α'') and (α' ≡ ᴺ (suc α'')).
 -- Since (predᴺ (ᴺ 0) ≡ -1) and (predᴺ (ᴺ (suc α)) ≡ ᴺ α),
 -- the result is simply (Type (predᴺ α')).
-≤⟦_⟧ {α'} {A = type _} _     = Type (predᴺ α')
+≤⟦_⟧ {α'} {A = type _} _     = Type# (pred# α')
 ≤⟦_⟧      {A = A  Π _} le-Π  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-Π   Π· x ⟧
 ≤⟦_⟧      {A = A ℓΠ _} le-ℓΠ = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-ℓΠ ℓΠ· x ⟧
 ≤⟦_⟧      {A = A ≥Π _} le-≥Π = ∀ {α'} {A' : Type α'} {le : A' ≤ A} ->
@@ -190,16 +194,10 @@ unL≤L (L≤L le) = le
 ≤⟦_⟧      {A = ᵀΣ A B} le-Σ  = Σ ᵀ⟦ A ⟧ λ x    -> ≤⟦ le-Σ   Σ· x ⟧
 ≤⟦_⟧      {A = Lift _} le-L  = ≤⟦ unL≤L le-L ⟧
 
-ℓe : ∀ {α' α} {A' : Type α'} {le : A' ≤ type α} -> ≤⟦ le ⟧ᵂ -> predᴺ α' ≤ℓᵂ (ᴺ α)
-ℓe {le = ᵀ≤ᵀ {α'≤α = α'≤α}} _ = tag α'≤α
-ℓe {le = p≤ᵀ}               _ = tag _
-
 ᵀcoerce : ∀ {α' α} {A' : Type α'} {A : Type α} -> ᵀ⟦ A' ⟧ -> A' ≤ A -> ᵀ⟦ A ⟧
-ᵀcoerce  p       p≤p                = p
-ᵀcoerce  t       p≤ᵀ                = Lift t
 ᵀcoerce  _       ⊤≤⊤                = _
 ᵀcoerce  n       ℕ≤ℕ                = n
-ᵀcoerce  t      (ᵀ≤ᵀ {α'≤α = α'≤α}) = Lift {α'≤α = α'≤α} t
+ᵀcoerce  T      (ᵀ≤ᵀ {α'≤α = α'≤α}) = Lift {α'≤α = α'≤α} T
 ᵀcoerce  f      ( Π≤Π  B'≤B)        = λ x -> ᵀcoerce (f x) (B'≤B x)
 ᵀcoerce  f      (ℓΠ≤ℓΠ B'≤B)        = λ x -> ᵀcoerce (f x) (B'≤B x)
 ᵀcoerce  f      (≥Π≥Π  B'≤B)        = λ x -> ᵀcoerce (f x) (B'≤B x)

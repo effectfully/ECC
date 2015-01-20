@@ -3,7 +3,7 @@ module ECC.Tests.FromExplicitSubtyping where
 
 open import ECC.Main
 
-ᵀtest-1 : Typeᴺ 2
+ᵀtest-1 : Type 2
 ᵀtest-1 = type 0
           Π λ a -> type 0
           Π λ b -> (a ⟶ b)
@@ -11,9 +11,9 @@ open import ECC.Main
           Π λ g -> b
 
 test-1 : Term ᵀtest-1
-test-1 = ⇧ λ a -> ⇧ λ b -> ⇧ λ f -> ⇧ λ g -> ↑ f · (↑ g ≥· ᵀ⌈ a ⌉ {_})
+test-1 = ⇧ λ a -> ⇧ λ b -> ⇧ λ f -> ⇧ λ g -> ↑ f · (↑ g ≥· ᵀ⌈ el a ⌉)
  
-ᵀtest-1' : Typeᴺ 2
+ᵀtest-1' : Type 2
 ᵀtest-1' = type 0
            Π λ a -> type 0
            Π λ b -> (a ⟶ b)
@@ -23,22 +23,20 @@ test-1 = ⇧ λ a -> ⇧ λ b -> ⇧ λ f -> ⇧ λ g -> ↑ f · (↑ g ≥· �
 test-1' : Term ᵀtest-1'
 test-1' = ⇧ λ a -> ⇧ λ b -> ⇧ λ f -> ⇧ λ g -> ↑ f · lower (↑ g · ↑ a ⟰ ᵀ≤ᵀ)
 
--- Without the impredicative universe it was just
--- ᵀtest-2 : Typeᴺ 2
--- ᵀtest-2 = (type 1 ≥⟶ type 1)
---           Π λ p -> (type 1 ≥⟶ type 1)
---           Π λ q -> (type 0 Π λ c -> p ⌈ c ⌉ᵀ ⟶ q ⌈ c ⌉ᵀ)
---           Π λ f -> (type 1 ≥Π λ a -> type 1 ≥Π λ b ->
---             p (⌈_⌉ᵀ {α'≤α = el (ℓe a ⊔̂ ℓe b)} (el a ⟶ el b)))
---           Π λ g -> type 0
---           Π λ a -> type 0
---           Π λ b -> q ⌈ a ⟶ b ⌉ᵀ
+ᵀtest-2 : Type 2
+ᵀtest-2 = (type 1 ≥⟶ type 1)
+          Π λ p -> (type 1 ≥⟶ type 1)
+          Π λ q -> (type 0 Π λ c -> p ᵀ⌈ c ⌉ ⟶ q ᵀ⌈ c ⌉)
+          Π λ f -> (type 1 ≥Π λ a -> type 1 ≥Π λ b -> p (a ⟶̃ b))
+          Π λ g -> type 0
+          Π λ a -> type 0
+          Π λ b -> q ᵀ⌈ a ⟶ b ⌉
 
--- test-2 : Term ᵀtest-2
--- test-2 = ⇧ λ p -> ⇧ λ q -> ⇧ λ f -> ⇧ λ g -> ⇧ λ a -> ⇧ λ b ->
---    ↑ f · ↓ (el a ⟶ el b) · (↑ g ≥· ⌈ el a ⌉ᵀ ≥· ⌈ el b ⌉ᵀ)
+test-2 : Term ᵀtest-2
+test-2 = ⇧ λ p -> ⇧ λ q -> ⇧ λ f -> ⇧ λ g -> ⇧ λ a -> ⇧ λ b ->
+   ↑ f · ↓ (el a ⟶ el b) · (↑ g ≥· ᵀ⌈ el a ⌉ ≥· ᵀ⌈ el b ⌉)
 
-ᵀtest-2' : Typeᴺ 2
+ᵀtest-2' : Type 2
 ᵀtest-2' = (type 1 ⟶ type 1)
            Π λ p -> (type 1 ⟶ type 1)
            Π λ q -> (type 0 Π λ c -> p (Lift c) ⟶ q (Lift c))
