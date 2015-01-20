@@ -31,10 +31,6 @@ data _∋_ : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧ -> Set where
   _≥➘_ : ∀ {α β} {B : Type β} {y} -> (A : Type α) -> B ∋ y ->  A ≥⟶ B ∋ λ _ -> y
   _,ᴮ_  : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β} -> ∀ x y -> ᵀΣ A B ∋ (x , y)
 
--- This retagging is annoying. Is it possible to avoid it?
-ᵀ-to-≤ : ∀ {α} {A : Type α} -> ᵀ⟦ A ⟧ᵂ -> ≤⟦ ≤-refl A ⟧ᵂ
-ᵀ-to-≤ (tag x) = tag x
-
 inhabit : ∀ {α} -> (A : Type α) -> ᵀ⟦ A ⟧
 inhabit  unit          = _
 inhabit  ᵀℕ            = 0
@@ -91,8 +87,8 @@ inhabit (Lift A)       = inhabit A
   go cont (ᵀΣ A B) p = go (λ x -> cont (proj₁ p         , x)) (B _) _
   go cont (Lift A) x = go cont A x
 
-⌈_⌉ : ∀ {α'} {A' : Type α'} {x : ᵀ⟦ A' ⟧} -> A' ∋ x -> ⌈ ≤⟦_⟧ᵂ / tagWith (≤-refl A') x ⌉ᵀ
-⌈_⌉ {A' = A'} {x} _ = ≤⌈ tagWith (≤-refl A') x ⌉
+⌈_⌉ : ∀ {α'} {A' : Type α'} {x : ᵀ⟦ A' ⟧ᵂ} -> A' ∋ el x -> ⌈ ≤⟦_⟧ᵂ / x ⌉ᵀ
+⌈_⌉ {x = x} _ = ≤⌈ x ⌉
 
 private
   open import Relation.Binary.PropositionalEquality

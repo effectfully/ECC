@@ -34,12 +34,12 @@ Typeω = Type ω
 ᵀ⟦_⟧ : ∀ {α} -> Type α -> Set
 ᵀ⟦ A ⟧ = ≤⟦ ≤-refl A ⟧
 
--- (ᵀ⟦_⟧ᵂ = ≤⟦_⟧ᵂ ∘ ≤-refl)?
-ᵀ⟦_⟧ᵂ : ∀ {α} -> Type α -> Set
-ᵀ⟦_⟧ᵂ = Tag ᵀ⟦_⟧
-
 ≤⟦_⟧ᵂ : ∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set
 ≤⟦_⟧ᵂ = Tag ≤⟦_⟧
+
+-- (Tag ᵀ⟦_⟧)?
+ᵀ⟦_⟧ᵂ : ∀ {α} -> Type α -> Set
+ᵀ⟦ A ⟧ᵂ = ≤⟦ ≤-refl A ⟧ᵂ
 
 data Type where
   unit : Propᵀ
