@@ -1,8 +1,3 @@
-module readme where
-
-open import ECC.Main
-open import Relation.Binary.PropositionalEquality
-
 # ECC-in-Agda
 
 This is an attempt to formalize [An Extended Calculus of Constructions]
@@ -65,7 +60,7 @@ data level : Set where
   ω : level
 ```
 
-The `#` constructor lifts a `ℕ` into a `level`. ‵ω‵ doesn't matter fow now.
+The `#` constructor lifts a `ℕ` into a `level`. `ω` doesn't matter fow now.
 
 The relevant part of the `Type` definition is
 
@@ -210,7 +205,9 @@ _⊔̂ℕᵢ_ {n} {m} (tag n≤p) (tag m≤p) = tag (⊔ℕᵢ-≤ℕ n {m} n≤
 (she often can infer `m`, if `n` is known, but it's easier to just tag everything).
 If we define `_⊔̂ℕᵢ_` like
 
+```
 _⊔̂ℕᵢ_ : ∀ {n m p} -> n ≤ℕ p -> m ≤ℕ p -> n ⊔ℕᵢ m ≤ℕ p
+```
 
 then we would need to explicitly pass `n` and `m` to every call to `_⊔̂ℕᵢ_`.
 A common tactic in this case is to wrap `_≤ℕ_` in an ad hoc record datatype,
@@ -243,7 +240,7 @@ Two auxuliary functions (the first is the special case of the second),
 that make `Terms` from plain Agda values are:
 
 ```
-That's how we get types at the value level.
+-- That's how we get types at the value level.
 ↓ : ∀ {α} -> Type (# α) -> Term (type α)
 ↓ = ↑ ∘ tag
 
@@ -343,13 +340,15 @@ test-15 = ᵀℕ ℓΠ λ α -> type α
 The `Term` datatype contains corresponding constructors for
 universe polymorphic function application and universe polymorphic lambda abstraction:
 
+```
 ℓ⇧ : ∀ {α} {A : Type α} {k : ᵀ⟦ A ⟧ -> level} {B : (x : ᵀ⟦ A ⟧) -> Type (k x)}
    -> ((x : ᵀ⟦ A ⟧ᵂ) -> Term (B (el x)))
    -> Term (A ℓΠ B)
 _ℓ·_ : ∀ {α} {A : Type α} {k : ᵀ⟦ A ⟧ -> level} {B : (x : ᵀ⟦ A ⟧) -> Type (k x)}
      -> Term (A ℓΠ B) -> (x : Term A) -> Term (B ⟦ x ⟧)
+```
 
-It is straightforward to make the `I` and `A` combinators universe polymorphic:
+It is straightforward to make the universe polymorphic `I` and `A` combinators:
 
 ```
 uI : Term (ᵀℕ ℓΠ λ α -> type α Π λ A -> A ⟶ A)
@@ -420,7 +419,7 @@ The type of the hole is `AnyType (_k_1034 .le)`. `A` in the hole has type `ᵀ�
 So we can't fill the hole with `A`. But we know, that `A` is of type `AnyType α`
 for some `α`, since the only rule, that matches the `A' ≤ type α` pattern
 is `type α' ≤ type α`, and `type α'` evaluates to `AnyType α'`.
-But with the definition, that uses `≤⟦_⟧`, it's not a problem:
+But with the definition, that uses `≤⟦_⟧`, there no such problem:
 
 ```
 test-19-ok : Type 1
