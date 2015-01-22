@@ -9,7 +9,7 @@ open import ECC.Main
 ᵀ¬ : Propᵀ -> Propᵀ
 ᵀ¬ P = P ⟶ ᵀ⊥
 
-ᵀ∃ : ∀ {α} (A : Type α) (P : ᵀ⟦ A ⟧ -> Propᵀ) -> Propᵀ
+ᵀ∃ : ∀ {α} -> (A : Type α) -> (ᵀ⟦ A ⟧ -> Propᵀ) -> Propᵀ
 ᵀ∃ A P = prop Π λ R -> (A Π λ x -> P x ⟶ R) ⟶ R
 
 _∧_ : Propᵀ -> Propᵀ -> Propᵀ

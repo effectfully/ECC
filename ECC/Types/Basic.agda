@@ -2,11 +2,11 @@
 
 module ECC.Types.Basic where
 
-open import ECC.Utilities   public
-open import ECC.Types.Level public
+open import ECC.Utilities           public
+open import ECC.Types.Level         public
 
-open import Data.Unit using (⊤)
-open import Data.Product    public
+open import Data.Unit using (⊤; tt) public
+open import Data.Product            public
 
 infixr 2 _Π_ _≥Π_ _⟶_ _≥⟶_
 infix  1 _≤_
@@ -16,16 +16,13 @@ data _≤_ : ∀ {α' α} -> Type α' -> Type α -> Set
 ≤-refl : ∀ {α} -> (A : Type α) -> A ≤ A
 ≤⟦_⟧ : ∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set
 
-Type# : ℕ -> Set
-Type# = Type ∘ # 
-
 -- (Prop) is reserved.
 Propᵀ : Set
-Propᵀ = Type# 0
+Propᵀ = Type (# 0)
 
 -- An analog of (λ α -> Set α).
 Typeᴺ : ℕ -> Set
-Typeᴺ = Type# ∘ suc
+Typeᴺ = Type ∘ # ∘ suc
 
 -- An analog of (Setω).
 Typeω : Set
@@ -45,7 +42,7 @@ data Type where
   unit : Propᵀ
   ᵀℕ : Typeᴺ 0
   -- A predicative hierarchy of universes.
-  type : ∀ α -> Type# (suc α)
+  type : ∀ α -> Typeᴺ α
   -- Induction-recursion as usual.
   _Π_ : ∀ {α β} -> (A : Type α) -> (ᵀ⟦ A ⟧ -> Type β) -> Type (α ⊔ᵢ β)
   -- Just like in Agda, e.g. ((∀ α -> Set α) : Setω).
@@ -54,7 +51,7 @@ data Type where
   _≥Π_ : ∀ {α}
        -> (A : Type α) {k : ∀ {α'} {A' : Type α'} -> A' ≤ A -> level}
        -> (∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k le))
-       -> Type (α ⊔ᵢ k (≤-refl A)) -- Could (k (≤-refl A) ≤ℕ k A'≤A)?
+       -> Type (α ⊔ᵢ k (≤-refl A)) -- Could (k (≤-refl A) <ℓ k A'≤A)?
   -- Do we need (_ℓ≥Π_)?
   ᵀΣ : ∀ {α β} -> (A : Type α) -> (ᵀ⟦ A ⟧ -> Type β) -> Type (α ⊔ β)
   Lift : ∀ {α' α} {α'≤α : α' ≤ℓ α} -> Type α' -> Type α
@@ -179,14 +176,14 @@ unL≤L : ∀ {lα' α ′α} {α≤′α : α ≤ℓ ′α} {LA' : Type lα'} {
       -> (le-L : LA' ≤ Lift {α = ′α} {α≤′α} A) -> proj₂ (L≤L-∃ le-L) ≤ A
 unL≤L (L≤L le) = le
 
-≤⟦_⟧      {A = unit}    _    = ⊤
-≤⟦_⟧      {A = ᵀℕ}     _     = ℕ
+≤⟦_⟧      {A = unit  } _     = ⊤
+≤⟦_⟧      {A = ᵀℕ    } _     = ℕ
 -- (A' : Type α'), (A' ≤ type α)
 -- If (A' ≡ prop)    , then the result is (Type -1) (or simply (ᵀProp)) and (α' ≡ ᴺ 0).
 -- If (A' ≡ type α''), then the result is (Type α'') and (α' ≡ ᴺ (suc α'')).
 -- Since (predᴺ (ᴺ 0) ≡ -1) and (predᴺ (ᴺ (suc α)) ≡ ᴺ α),
 -- the result is simply (Type (predᴺ α')).
-≤⟦_⟧ {α'} {A = type _} _     = Type# (pred# α')
+≤⟦_⟧ {α'} {A = type _} _     = Type (# (pred# α'))
 ≤⟦_⟧      {A = A  Π _} le-Π  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-Π   Π· x ⟧
 ≤⟦_⟧      {A = A ℓΠ _} le-ℓΠ = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-ℓΠ ℓΠ· x ⟧
 ≤⟦_⟧      {A = A ≥Π _} le-≥Π = ∀ {α'} {A' : Type α'} {le : A' ≤ A} ->
