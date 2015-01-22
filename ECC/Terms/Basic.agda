@@ -6,7 +6,6 @@ infixl 4 _·_ _ℓ·_ _≥·_
 
 mutual
   data Term : ∀ {α} -> Type α -> Set where
-    tt : Term unit
     -- Handles variables, types at the value level and plain Agda values.
     -- We can't use simple (ᵀ⟦ A ⟧) here, because Agda can't infer (A) from (ᵀ⟦ A ⟧).
     ↑ : ∀ {α} {A : Type α} -> ᵀ⟦ A ⟧ᵂ -> Term A
@@ -47,7 +46,6 @@ mutual
     _⟰_ : ∀ {α' α} {A' : Type α'} {A : Type α} -> Term A' -> A' ≤ A -> Term A
 
   ⟦_⟧ : ∀ {α} {A : Type α} -> Term A -> ᵀ⟦ A ⟧
-  ⟦ tt       ⟧ = _
   ⟦ ↑ x      ⟧ = el x
   ⟦  ⇧ f     ⟧ = λ x -> ⟦ f (tag x) ⟧
   ⟦ ℓ⇧ f     ⟧ = λ x -> ⟦ f (tag x) ⟧
@@ -63,7 +61,7 @@ mutual
   ⟦ x ⟰ le  ⟧ = ᵀcoerce ⟦ x ⟧ le
 
 -- Types at the value level.
-↓ : ∀ {α} -> Type# α -> Term (type α)
+↓ : ∀ {α} -> Type (# α) -> Term (type α)
 ↓ = ↑ ∘ tag
 
 -- Plain Agda values. Good for types too.
