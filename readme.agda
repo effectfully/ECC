@@ -29,7 +29,7 @@ I = ⇧ λ _ -> ⇧ λ x -> ↑ x
 -- `⇧` is a constructor of the `Term` datatype, that being applied to a function of type
 -- `(x : ᵀ⟦ A ⟧) -> Term (B x)` returns a `Term (A Π B)` modulo wrapping-unwrapping.
 
--- All semantic brackets like `ᵀ⟦_⟧` is functions from the defined datatypes to
+-- All semantic brackets like `ᵀ⟦_⟧` are functions from the defined datatypes to
 -- what they denote. For example we could define
 
 -- ```
@@ -520,7 +520,7 @@ module mproof-1 where
 -- bounded function application differs a bit.
 -- The second argument of `_≥·_` is not a `Term` like in other cases ─
 -- it's a tagged plain Agda value, e.g. `tagWith ℕ≤ℕ 0`.
--- There is the `LeBasic.agda` module, which fixes this,
+-- There is the `LeBasic` module, which fixes this,
 -- but it's totally untested and there are no utilities for this module for now.
 
 -- Some tests for subtyping:
