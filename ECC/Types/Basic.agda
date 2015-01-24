@@ -16,7 +16,7 @@ data _≤_ : ∀ {α' α} -> Type α' -> Type α -> Set
 ≤-refl : ∀ {α} -> (A : Type α) -> A ≤ A
 ≤⟦_⟧ : ∀ {α' α} {A' : Type α'} {A : Type α} -> A' ≤ A -> Set
 
--- (Prop) is reserved.
+-- I wish I could name it (Prop).
 Propᵀ : Set
 Propᵀ = Type (# 0)
 
@@ -38,6 +38,9 @@ Typeω = Type ω
 ᵀ⟦_⟧ᵂ : ∀ {α} -> Type α -> Set
 ᵀ⟦ A ⟧ᵂ = ≤⟦ ≤-refl A ⟧ᵂ
 
+ᵀtag : ∀ {α} {A : Type α} -> ᵀ⟦ A ⟧ -> ᵀ⟦ A ⟧ᵂ
+ᵀtag = tag
+
 data Type where
   unit : Propᵀ
   ᵀℕ : Typeᴺ 0
@@ -51,7 +54,8 @@ data Type where
   _≥Π_ : ∀ {α}
        -> (A : Type α) {k : ∀ {α'} {A' : Type α'} -> A' ≤ A -> level}
        -> (∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k le))
-       -> Type (α ⊔ᵢ k (≤-refl A)) -- Could (k (≤-refl A) <ℓ k A'≤A)?
+       -> Type (α ⊔ᵢ k (≤-refl A))
+       -- Could (k (≤-refl A) <ℓ k A'≤A)? And without typecase?
   -- Do we need (_ℓ≥Π_)?
   ᵀΣ : ∀ {α β} -> (A : Type α) -> (ᵀ⟦ A ⟧ -> Type β) -> Type (α ⊔ β)
   Lift : ∀ {α' α} {α'≤α : α' ≤ℓ α} -> Type α' -> Type α
@@ -191,12 +195,29 @@ unL≤L (L≤L le) = le
 ≤⟦_⟧      {A = ᵀΣ A B} le-Σ  = Σ ᵀ⟦ A ⟧ λ x    -> ≤⟦ le-Σ   Σ· x ⟧
 ≤⟦_⟧      {A = Lift _} le-L  = ≤⟦ unL≤L le-L ⟧
 
-ᵀcoerce : ∀ {α' α} {A' : Type α'} {A : Type α} -> ᵀ⟦ A' ⟧ -> A' ≤ A -> ᵀ⟦ A ⟧
-ᵀcoerce  _       ⊤≤⊤                = _
-ᵀcoerce  n       ℕ≤ℕ                = n
-ᵀcoerce  T      (ᵀ≤ᵀ {α'≤α = α'≤α}) = Lift {α'≤α = α'≤α} T
-ᵀcoerce  f      ( Π≤Π  B'≤B)        = λ x -> ᵀcoerce (f x) (B'≤B x)
-ᵀcoerce  f      (ℓΠ≤ℓΠ B'≤B)        = λ x -> ᵀcoerce (f x) (B'≤B x)
-ᵀcoerce  f      (≥Π≥Π  B'≤B)        = λ x -> ᵀcoerce (f x) (B'≤B x)
-ᵀcoerce (x , P) ( Σ≤Σ  B'≤B)        = x , ᵀcoerce P (B'≤B x)
-ᵀcoerce  T      (L≤L   A'≤A)        = ᵀcoerce T A'≤A
+_ᵀ⟰_ : ∀ {α' α} {A' : Type α'} {A : Type α} -> ᵀ⟦ A' ⟧ -> A' ≤ A -> ᵀ⟦ A ⟧
+_       ᵀ⟰  ⊤≤⊤                = _
+n       ᵀ⟰  ℕ≤ℕ                = n
+A       ᵀ⟰ (ᵀ≤ᵀ {α'≤α = α'≤α}) = Lift {α'≤α = α'≤α} A
+f       ᵀ⟰   Π≤Π  B'≤B         = λ x -> f x ᵀ⟰ B'≤B x
+f       ᵀ⟰  ℓΠ≤ℓΠ B'≤B         = λ x -> f x ᵀ⟰ B'≤B x
+f       ᵀ⟰  ≥Π≥Π  B'≤B         = λ x -> f x ᵀ⟰ B'≤B x
+(x , y) ᵀ⟰   Σ≤Σ  B'≤B         = x , y ᵀ⟰ B'≤B x
+x       ᵀ⟰  L≤L le             = x ᵀ⟰ le
+
+-- Is it possible to have this more or less definitionally?
+-- Maybe it is (≤⟦_⟧) should be defined in terms of (ᵀ⟦_⟧) and (_≤_)?
+-- Recursion on (le) is not a good idea probably.
+_⇅_ : ∀ {α' α ′α} {A' : Type α'} {A : Type α} {′A : Type ′α} {le : A' ≤ A}
+    -> ≤⟦ le ⟧ᵂ -> (′le : A' ≤ ′A) -> ≤⟦ ′le ⟧ᵂ
+_⇅_ {le = le} (tag x) ′le = tag (go le x ′le) where
+  go : ∀ {α' α ′α} {A' : Type α'} {A : Type α} {′A : Type ′α}
+     -> (le : A' ≤ A) -> ≤⟦ le ⟧ -> (′le : A' ≤ ′A) -> ≤⟦ ′le ⟧
+  go  ⊤≤⊤         _       ⊤≤⊤         = _
+  go  ℕ≤ℕ         n       ℕ≤ℕ         = n
+  go  ᵀ≤ᵀ         A       ᵀ≤ᵀ         = A
+  go ( Π≤Π  fle)  f      ( Π≤Π  ′fle) = λ x -> go (fle x) (f x) (′fle x)
+  go (ℓΠ≤ℓΠ fle)  f      (ℓΠ≤ℓΠ ′fle) = λ x -> go (fle x) (f x) (′fle x)
+  go (≥Π≥Π  fle)  f      (≥Π≥Π  ′fle) = λ x -> go (fle x) (f x) (′fle x)
+  go ( Σ≤Σ  fle) (x , y) ( Σ≤Σ  ′fle) = x , (go (fle x) y (′fle x))
+  go (L≤L le   )  x      (L≤L ′le)    = go le x ′le

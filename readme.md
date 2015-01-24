@@ -1,3 +1,8 @@
+module readme where
+
+open import ECC.Main
+open import Relation.Binary.PropositionalEquality
+
 # ECC-in-Agda
 
 This is an attempt to formalize [An Extended Calculus of Constructions]
@@ -338,7 +343,7 @@ test-15 = ᵀℕ ℓΠ λ α -> type α
 ```
 
 The `Term` datatype contains corresponding constructors for
-universe polymorphic function application and universe polymorphic lambda abstraction:
+universe polymorphic lambda abstraction and universe polymorphic function application:
 
 ```
 ℓ⇧ : ∀ {α} {A : Type α} {k : ᵀ⟦ A ⟧ -> level} {B : (x : ᵀ⟦ A ⟧) -> Type (k x)}
@@ -419,7 +424,7 @@ The type of the hole is `AnyType (_k_1034 .le)`. `A` in the hole has type `ᵀ�
 So we can't fill the hole with `A`. But we know, that `A` is of type `AnyType α`
 for some `α`, since the only rule, that matches the `A' ≤ type α` pattern
 is `type α' ≤ type α`, and `type α'` evaluates to `AnyType α'`.
-But with the definition, that uses `≤⟦_⟧`, there no such problem:
+But with the definition, that uses `≤⟦_⟧`, there is no such problem:
 
 ```
 test-19-ok : Type 1
@@ -477,7 +482,7 @@ module mproof-1 where
   proof-1 ᵀ≤ᵀ = refl
 ```
 
-And for the product type `≤⟦_⟧` is
+And the `_Π_` case:
 
 ```
 ≤⟦_⟧      {A = A  Π _} le-Π  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-Π   Π· x ⟧
@@ -497,3 +502,70 @@ We cannot just write
 
 since it would force an argument of `≤⟦_⟧` to be in head weak normal form,
 making `≤⟦ le ⟧` stuck, when `le` is not in whnf.
+
+Bounded lambda abstraction and bounded function application are
+
+```
+≥⇧ : ∀ {α} {A : Type α} {k : ∀ {α'} {A' : Type α'} -> A' ≤ A -> level}
+       {B : ∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k le)}
+   -> (∀ {α'} {A' : Type α'} {le : A' ≤ A} -> (x : ≤⟦ le ⟧ᵂ) -> Term (B x))
+   -> Term (A ≥Π B)
+_≥·_ : ∀ {α' α} {A' : Type α'} {A : Type α} {le : A' ≤ A}
+         {k : ∀ {α'} {A' : Type α'} -> A' ≤ A -> level}
+         {B : ∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k le)}
+     -> Term (A ≥Π B) -> (x : ≤⟦ le ⟧ᵂ) -> Term (B x)
+```
+
+While bounded lambda abstraction follows the common pattern,
+bounded function application differs a bit.
+The second argument of `_≥·_` is not a `Term` like in other cases ─
+it's a tagged plain Agda value, e.g. `tagWith ℕ≤ℕ 0`.
+There is the `LeBasic.agda` module, which fixes this,
+but it's totally untested and there are no utilities for this module for now.
+
+Some tests for subtyping:
+
+```
+sI : Term (type 2 ≥Π λ A -> el A ⟶ el A)
+sI = ≥⇧ λ A -> ⇧ λ x -> ↑ x
+
+sA : Term (type 2
+         ≥Π λ A -> (el A ⟶ type 2)
+         ≥Π λ B -> (el A Π el B)
+          Π λ f -> el A
+          Π λ x -> el B x)
+sA = ≥⇧ λ A -> ≥⇧ λ B -> ⇧ λ f -> ⇧ λ x -> ↑ f · ↑ x
+```
+
+This term corresponds to `id $ 0`
+
+```
+test-20 : Term ᵀℕ
+test-20 = sA
+       ≥· (tagWith ᵀ≤ᵀ ᵀℕ)
+       ≥· (tagWith (Π≤Π λ _ -> ᵀ≤ᵀ) (λ _ -> ᵀℕ))
+        · (sI ≥· tagWith ᵀ≤ᵀ ᵀℕ)
+        · plain 0
+```
+
+This term corresponds to `id $ ℕ`
+
+```
+test-21 : Term (type 0)
+test-21 = sA
+       ≥· (tagWith ᵀ≤ᵀ (type 0))
+       ≥· (tagWith (Π≤Π λ _ -> ᵀ≤ᵀ) (λ _ -> type 0))
+        · (sI ≥· tagWith ᵀ≤ᵀ (type 0))
+        · ↓ ᵀℕ
+```
+
+This term corresponds to `id $ Set`
+
+```
+test-22 : Term (type 1)
+test-22 = sA
+       ≥· (tagWith ᵀ≤ᵀ (type 1))
+       ≥· (tagWith (Π≤Π λ _ -> ᵀ≤ᵀ) (λ _ -> type 1))
+        · (sI ≥· tagWith ᵀ≤ᵀ (type 1))
+        · ↓ (type 0)
+```

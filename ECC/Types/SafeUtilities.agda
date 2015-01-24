@@ -116,11 +116,6 @@ last-level  _       = 0
   go {A = ᵀΣ A B} le p      ′α≤′′α = proj₁ p , go (le Σ· proj₁ p) (proj₂ p) ′α≤′′α
   go {A = Lift A} le x             = go (unL≤L le) x
 
--- ᵀ⌈_⌉ : ∀ {α' α} {A' : Type α'}
---      -> (x : ᵀ⟦ A' ⟧ᵂ) {≤α : last-level A' ≤ℕᵂ α} 
---      -> ≤⟦ generalize (ᵀ-to-≤ x) ≤α ⟧ᵂ
--- ᵀ⌈_⌉ {A' = A'} x {≤α} = ≤⌈ ᵀ-to-≤ x ⌉ {≤′α = ≤α}
-
 private
   example : ≤⌈ tagWith ( Π≤Π  {A = type 0} λ _ -> ᵀ≤ᵀ {α = 3}) id ⌉
           ≡    tagWith (ℓΠ≤ℓΠ {A = type 0} λ _ -> ᵀ≤ᵀ {α = 5}) id
