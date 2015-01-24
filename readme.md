@@ -1,8 +1,3 @@
-module readme where
-
-open import ECC.Main
-open import Relation.Binary.PropositionalEquality
-
 # ECC-in-Agda
 
 This is an attempt to formalize [An Extended Calculus of Constructions]
