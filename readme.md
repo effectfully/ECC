@@ -492,7 +492,7 @@ And the `_Π_` case:
 We cannot just write
 
 ```
-≤⟦_⟧      {A = A  Π _} (Π≤Π B'≤B)  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ B'≤B · x ⟧
+≤⟦_⟧      {A = A  Π _} (Π≤Π B'≤B)  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ B'≤B x ⟧
 ```
 
 since it would force an argument of `≤⟦_⟧` to be in head weak normal form,
