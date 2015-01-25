@@ -60,7 +60,7 @@ data level : Set where
   ω : level
 ```
 
-The `#` constructor lifts a `ℕ` into a `level`. `ω` doesn't matter fow now.
+The `#` constructor lifts a `ℕ` into a `level`. `ω` doesn't matter for now.
 
 The relevant part of the `Type` definition is
 
