@@ -8,6 +8,7 @@ open import Level
 record Tag {α β} {A : Set α} (B : (x : A) -> Set β) (x : A) : Set (α ⊔ β) where
   constructor tag
   field el : B x
+  tagOf = x
 open Tag public
 
 -- Explicit tagging.
