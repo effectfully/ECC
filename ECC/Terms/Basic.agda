@@ -13,6 +13,14 @@ mutual
     ⇧ : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
       -> ((x : ᵀ⟦ A ⟧ᵂ) -> Term (B (el x)))
       -> Term (A Π B)
+    -- Alternatively we could define
+    -- ⇧ : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
+    --   -> ((x : Term A) -> Term (B ⟦ x ⟧))
+    --   -> Term (A Π B)
+    -- This allows to get rid of tagging and to rename (↑) to (plain),
+    -- but requires the --no-positivity-check pragma
+    -- (and for some reason the TERMINATING pragma),
+    -- which is turned on in the Types.Basic module anyway.
     ℓ⇧ : ∀ {α} {A : Type α} {k : ᵀ⟦ A ⟧ -> level} {B : (x : ᵀ⟦ A ⟧) -> Type (k x)}
        -> ((x : ᵀ⟦ A ⟧ᵂ) -> Term (B (el x)))
        -> Term (A ℓΠ B)
@@ -32,12 +40,14 @@ mutual
       -- We could also have (≤Term le) with an appropriate (≤⟦_⟧)
       -- instead of just (≤⟦ le ⟧ᵂ), but this approach is too restricted
       -- and doesn't look very useful.
+    -- Pairs.
     pair : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
          -> (x : Term A) -> Term (B ⟦ x ⟧) -> Term (ᵀΣ A B)
     fst : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
         -> Term (ᵀΣ A B) -> Term A
     snd : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
         -> (p : Term (ᵀΣ A B)) -> Term (B (proj₁ ⟦ p ⟧))
+    -- Lifting stuff.
     lift  : ∀ {α' α} {α'≤α : α' ≤ℓ α} {A' : Type α'}
           -> Term A' -> Term (Lift {α = α} {α'≤α} A')
     lower : ∀ {α' α} {α'≤α : α' ≤ℓ α} {A' : Type α'}

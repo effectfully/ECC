@@ -29,12 +29,14 @@ mutual
               {k : ∀ {α'} {A' : Type α'} -> A' ≤ A -> level}
               {B : ∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k le)}
           -> Term (A ≥Π B) -> (le : A' ≤ A) -> (x : Term A') -> Term (B (ᵀtag ⟦ x ⟧ ⇅ le))
+    -- Pairs.
     pair : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
          -> (x : Term A) -> Term (B ⟦ x ⟧) -> Term (ᵀΣ A B)
     fst : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
         -> Term (ᵀΣ A B) -> Term A
     snd : ∀ {α β} {A : Type α} {B : ᵀ⟦ A ⟧ -> Type β}
-        -> (p : Term (ᵀΣ A B)) -> Term (B (proj₁ ⟦ p ⟧)) 
+        -> (p : Term (ᵀΣ A B)) -> Term (B (proj₁ ⟦ p ⟧))
+    -- Lifting stuff.
     lift  : ∀ {α' α} {α'≤α : α' ≤ℓ α} {A' : Type α'}
           -> Term A' -> Term (Lift {α = α} {α'≤α} A')
     lower : ∀ {α' α} {α'≤α : α' ≤ℓ α} {A' : Type α'}

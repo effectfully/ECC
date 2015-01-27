@@ -65,7 +65,7 @@ S = ⇧ λ _ -> ⇧ λ _ -> ⇧ λ _ -> ⇧ λ f -> ⇧ λ g -> ⇧ λ x -> ↑ 
 --   ω : level
 -- ```
 
--- The `#` constructor lifts a `ℕ` into a `level`. `ω` doesn't matter fow now.
+-- The `#` constructor lifts a `ℕ` into a `level`. `ω` doesn't matter for now.
 
 -- The relevant part of the `Type` definition is
 
@@ -497,7 +497,7 @@ module mproof-1 where
 -- We cannot just write
 
 -- ```
--- ≤⟦_⟧      {A = A  Π _} (Π≤Π B'≤B)  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ B'≤B · x ⟧
+-- ≤⟦_⟧      {A = A  Π _} (Π≤Π B'≤B)  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ B'≤B x ⟧
 -- ```
 
 -- since it would force an argument of `≤⟦_⟧` to be in head weak normal form,

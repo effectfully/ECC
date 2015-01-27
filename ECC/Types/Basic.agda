@@ -79,6 +79,9 @@ A ᵂΠ B = A Π B ∘ tag
 data _≤_ where
   ⊤≤⊤ : unit ≤ unit
   ℕ≤ℕ : ᵀℕ ≤ ᵀℕ
+  -- Alternatively we could define
+  -- ᵀ≤ᵀ : ∀ {α β} -> type α ≤ type (α ⊔ β)
+  -- Maybe this is the right way?
   ᵀ≤ᵀ : ∀ {α' α} {α'≤α : α' ≤ℕ α} -> type α' ≤ type α
   Π≤Π : ∀ {α β' β} {A : Type α}
           {B' : ᵀ⟦ A ⟧ -> Type β'}
@@ -182,11 +185,6 @@ unL≤L (L≤L le) = le
 
 ≤⟦_⟧      {A = unit  } _     = ⊤
 ≤⟦_⟧      {A = ᵀℕ    } _     = ℕ
--- (A' : Type α'), (A' ≤ type α)
--- If (A' ≡ prop)    , then the result is (Type -1) (or simply (ᵀProp)) and (α' ≡ ᴺ 0).
--- If (A' ≡ type α''), then the result is (Type α'') and (α' ≡ ᴺ (suc α'')).
--- Since (predᴺ (ᴺ 0) ≡ -1) and (predᴺ (ᴺ (suc α)) ≡ ᴺ α),
--- the result is simply (Type (predᴺ α')).
 ≤⟦_⟧ {α'} {A = type _} _     = Type (# (pred# α'))
 ≤⟦_⟧      {A = A  Π _} le-Π  = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-Π   Π· x ⟧
 ≤⟦_⟧      {A = A ℓΠ _} le-ℓΠ = (x : ᵀ⟦ A ⟧)   -> ≤⟦ le-ℓΠ ℓΠ· x ⟧
@@ -206,7 +204,7 @@ f       ᵀ⟰  ≥Π≥Π  B'≤B         = λ x -> f x ᵀ⟰ B'≤B x
 x       ᵀ⟰  L≤L le             = x ᵀ⟰ le
 
 -- Is it possible to have this more or less definitionally?
--- Maybe it is (≤⟦_⟧) should be defined in terms of (ᵀ⟦_⟧) and (_≤_)?
+-- Maybe it is (≤⟦_⟧) should be somehow defined in terms of (ᵀ⟦_⟧) and (_≤_)?
 -- Recursion on (le) is not a good idea probably.
 _⇅_ : ∀ {α' α ′α} {A' : Type α'} {A : Type α} {′A : Type ′α} {le : A' ≤ A}
     -> ≤⟦ le ⟧ᵂ -> (′le : A' ≤ ′A) -> ≤⟦ ′le ⟧ᵂ
