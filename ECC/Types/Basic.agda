@@ -81,7 +81,6 @@ data _≤_ where
   ℕ≤ℕ : ᵀℕ ≤ ᵀℕ
   -- Alternatively we could define
   -- ᵀ≤ᵀ : ∀ {α β} -> type α ≤ type (α ⊔ β)
-  -- Maybe this is the right way?
   ᵀ≤ᵀ : ∀ {α' α} {α'≤α : α' ≤ℕ α} -> type α' ≤ type α
   Π≤Π : ∀ {α β' β} {A : Type α}
           {B' : ᵀ⟦ A ⟧ -> Type β'}

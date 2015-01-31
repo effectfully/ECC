@@ -1,6 +1,6 @@
 module ECC.Types.Utilities where
 
-open import ECC.Types.Basic hiding (_∋_)
+open import ECC.Types.Basic
 
 infixl 0 _∋_
 infixr 2 _⟶̃_ _➘_ _≥➘_
