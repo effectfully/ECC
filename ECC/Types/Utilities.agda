@@ -3,7 +3,7 @@ module ECC.Types.Utilities where
 open import ECC.Types.Basic
 
 infixl 0 _∋_
-infixr 2 _⟶̃_ _➘_ _≥➘_
+infixr 2 _⟶̃_ _≥⟶̃_ _➘_ _≥➘_
 
 ℓe : ∀ {α' α} {A' : Type α'} {le : A' ≤ type α} -> ≤⟦ le ⟧ᵂ -> pred# α' ≤ℕᵂ α
 ℓe {le = ᵀ≤ᵀ {α'≤α = α'≤α}} _ = tag α'≤α

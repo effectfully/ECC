@@ -56,8 +56,8 @@ mutual
   ⟦  ⇧ f            ⟧ = λ x -> ⟦ f (tag x) ⟧
   ⟦ ℓ⇧ f            ⟧ = λ x -> ⟦ f (tag x) ⟧
   ⟦ ≥⇧ f            ⟧ = λ x -> ⟦ f      x  ⟧
-  ⟦ f  · x          ⟧ = ⟦ f ⟧ ⟦ x ⟧
-  ⟦ f ℓ· x          ⟧ = ⟦ f ⟧ ⟦ x ⟧
+  ⟦ f  ·  x         ⟧ = ⟦ f ⟧ ⟦ x ⟧
+  ⟦ f ℓ·  x         ⟧ = ⟦ f ⟧ ⟦ x ⟧
   ⟦ f ≥· (x ∈̃ le)   ⟧ = ⟦ f ⟧ (ᵀtag ⟦ x ⟧ ⇅ le)
   ⟦ pair x y        ⟧ = ⟦ x ⟧ , ⟦ y ⟧
   ⟦ fst p           ⟧ = proj₁ ⟦ p ⟧

@@ -216,5 +216,5 @@ _⇅_ {le = le} (tag x) ′le = tag (go le x ′le) where
   go ( Π≤Π  fle)  f      ( Π≤Π  ′fle) = λ x -> go (fle x) (f x) (′fle x)
   go (ℓΠ≤ℓΠ fle)  f      (ℓΠ≤ℓΠ ′fle) = λ x -> go (fle x) (f x) (′fle x)
   go (≥Π≥Π  fle)  f      (≥Π≥Π  ′fle) = λ x -> go (fle x) (f x) (′fle x)
-  go ( Σ≤Σ  fle) (x , y) ( Σ≤Σ  ′fle) = x , (go (fle x) y (′fle x))
-  go (L≤L le   )  x      (L≤L ′le)    = go le x ′le
+  go ( Σ≤Σ  fle) (x , y) ( Σ≤Σ  ′fle) = x , go (fle x) y (′fle x)
+  go (L≤L   le )  x      (L≤L   ′le ) = go le x ′le
