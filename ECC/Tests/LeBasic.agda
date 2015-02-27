@@ -23,23 +23,47 @@ test-1 = I ≥· (↓ _ ∈̃ ᵀ≤ᵀ) · plain 0
 A : Term ᵀA
 A = ≥⇧ λ A -> ≥⇧ λ B -> ⇧ λ f -> ⇧ λ x -> ↑ f · ↑ x
 
-test-5 : Term ᵀℕ
-test-5 = A
+test-2 : Term ᵀℕ
+test-2 = A
       ≥· (↓ _ ∈̃ ᵀ≤ᵀ)
       ≥· ((⇧ λ _ -> ↓ _) ∈̃ Π≤Π λ _ -> ᵀ≤ᵀ)
        · (I ≥· (↓ _ ∈̃ ᵀ≤ᵀ))
        · plain 0
 
-test-6 : Term (type 0)
-test-6 = A
+test-3 : Term (type 0)
+test-3 = A
       ≥· (↓ _ ∈̃ ᵀ≤ᵀ)
       ≥· ((⇧ λ _ -> ↓ _) ∈̃ Π≤Π λ _ -> ᵀ≤ᵀ)
        · (I ≥· (↓ _ ∈̃ ᵀ≤ᵀ))
        · ↓ ᵀℕ
 
-test-7 : Term (type 1)
-test-7 = A
+test-4 : Term (type 1)
+test-4 = A
       ≥· (↓ _ ∈̃ ᵀ≤ᵀ)
       ≥· ((⇧ λ _ -> ↓ _) ∈̃ Π≤Π λ _ -> ᵀ≤ᵀ)
        · (I ≥· (↓ _ ∈̃ ᵀ≤ᵀ))
        · ↓ (type 0)
+
+iI : ∀ {α} {α≤3 : α ≤ℕ 3} {A : ≤⟦ ᵀ≤ᵀ {α} {α'≤α = α≤3} ⟧ᵂ} -> Term (el A ⟶ el A)
+iI {α≤3 = α≤3} = I ≥· ↓ _ ∈̃ ᵀ≤ᵀ {α'≤α = α≤3}
+
+test-i1 : Term ᵀℕ
+test-i1 = iI · plain 0
+
+ᵀiA : Set
+ᵀiA = ∀ {α β} {α≤3 : α ≤ℕ 3} {β≤3 : β ≤ℕ 3} {A : ≤⟦ ᵀ≤ᵀ {α} {α'≤α = α≤3} ⟧ᵂ}
+      {B : ≤⟦ (Π≤Π {A = el A} λ _ -> ᵀ≤ᵀ {β} {α'≤α = β≤3}) ⟧ᵂ}
+    -> Term ((el A Π el B) ⟶ el A Π el B)
+
+iA : ᵀiA
+iA {α≤3 = α≤3} {β≤3} = A ≥· (↓ _ ∈̃ ᵀ≤ᵀ {α'≤α = α≤3})
+                         ≥· ((⇧ λ _ -> ↓ _) ∈̃ Π≤Π λ _ -> ᵀ≤ᵀ {α'≤α = β≤3})
+
+test-i2 : Term ᵀℕ
+test-i2 = iA · iI · plain 0
+
+test-i3 : Term (type 0)
+test-i3 = iA · iI · ↓ ᵀℕ
+
+test-i4 : Term (type 1)
+test-i4 = iA · iI · ↓ (type 0)
