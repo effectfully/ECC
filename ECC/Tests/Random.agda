@@ -64,3 +64,4 @@ test-10 = test-8 ≥· tagWith (Π≤Π ≤-refl) inhabit
 ᵀtest-12 = (type 1 ≥⟶ type 1)
            Π λ p -> type 0
           ≥Π λ c -> p ≤⌈ c ⌉
+-- ≤⌈_⌉ is too restricted and complicated. Would it be better to replace it with (≤-trans)?

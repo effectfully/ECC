@@ -101,7 +101,7 @@ typeᴺ = type ∘ suc
 
 A user doesn't see, that `prop` and `typeᴺ` are represented in terms of
 the same `type` constructor, since this constructor is renamed in the `ECC.Main` module
-to `anytype` and `typeᴺ` is renamed to `type`.
+to `universe` and `typeᴺ` is renamed to `type`.
 
 With this representation you don't need this three rules for subtyping:
 
@@ -116,7 +116,7 @@ just the last one. It's also crucial for unification to have only one rule.
 One another option is to extend the `ℕ` datatype with the `-1` constant
 and to defined `prop = type -1` in the style of HoTT, but this breaks unification again.
 
-`ECC.Main` also renames `Type` to `AnyType` and `Typeᴺ to Type`. Let's do some tests:
+`ECC.Main` also renames `Type` to `Universe` and `Typeᴺ to Type`. Let's do some tests:
 
 ```
 test-2 : Propᵀ
@@ -252,7 +252,7 @@ A couple of basic examples:
 
 ```
 test-11 : Term unit
-test-11 = plain tt
+test-11 = plain _
 
 test-12 : Term prop
 test-12 = ↓ unit
@@ -402,23 +402,23 @@ Roughly, in `A ≥Π B` `B` receives a value of type `ᵀ⟦ A' ⟧`
 for all `A'`, such that `A' ≤ A`.
 However if we define `_≥Π_` in terms of `ᵀ⟦_⟧`, we would need to pattern-match on `A'`,
 which is universally quantified and hence unknown. That would make unification stuck.
-For example (remember, that `Type` was renamed to `AnyType`):
+For example (remember, that `Type` was renamed to `Universe`):
 
 ```
 postulate
   _≥Π'_ : ∀ {α}
-        -> (A : AnyType α) {k : ∀ {α'} {A' : AnyType α'} -> A' ≤ A -> level}
-        -> (∀ {α'} {A' : AnyType α'} {le : A' ≤ A} -> ᵀ⟦ A' ⟧ -> AnyType (k le))
-        -> AnyType (α ⊔ᵢ k (≤-refl A))
+        -> (A : Universe α) {k : ∀ {α'} {A' : Universe α'} -> A' ≤ A -> level}
+        -> (∀ {α'} {A' : Universe α'} {le : A' ≤ A} -> ᵀ⟦ A' ⟧ -> Universe (k le))
+        -> Universe (α ⊔ᵢ k (≤-refl A))
 
 test-19 : Type 1
 test-19 = type 0 ≥Π' λ A -> {!!}
 ```
 
-The type of the hole is `AnyType (_k_1034 .le)`. `A` in the hole has type `ᵀ⟦ .A' ⟧`.
-So we can't fill the hole with `A`. But we know, that `A` is of type `AnyType α`
+The type of the hole is `Universe (_k_1034 .le)`. `A` in the hole has type `ᵀ⟦ .A' ⟧`.
+So we can't fill the hole with `A`. But we know, that `A` is of type `Universe α`
 for some `α`, since the only rule, that matches the `A' ≤ type α` pattern
-is `type α' ≤ type α`, and `type α'` evaluates to `AnyType α'`.
+is `type α' ≤ type α`, and `type α'` evaluates to `Universe α'`.
 But with the definition, that uses `≤⟦_⟧`, there is no such problem:
 
 ```
@@ -473,7 +473,7 @@ due to the predicativity. Here is a proof (with the renamings):
 ```
 module mproof-1 where
   open import Relation.Binary.HeterogeneousEquality
-  proof-1 : ∀ {α' α} {A' : AnyType α'} -> A' ≤ anytype α -> A' ≅ anytype (pred# α')
+  proof-1 : ∀ {α' α} {A' : Universe α'} -> A' ≤ universe α -> A' ≅ universe (pred# α')
   proof-1 ᵀ≤ᵀ = refl
 ```
 

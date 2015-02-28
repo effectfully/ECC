@@ -4,7 +4,7 @@ open import ECC.Utilities
 
 open import Relation.Binary.PropositionalEquality
 open import Data.Empty
-open import Data.Unit
+open import Data.Unit.Base
 open import Data.Nat hiding (module _≤_; _≤_) renaming (_⊔_ to _⊔ℕ_) public
 open import Data.Product
 
@@ -61,7 +61,9 @@ pred#  ω    = 0
 
 _⊔ᵢ_ : level -> level -> level
 # n ⊔ᵢ # m = # (n ⊔ℕᵢ m)
-# 0 ⊔ᵢ β   = β
+-- Comment this pointless line and you'll get an internal error.
+-- Find a mcve to form a report.
+# α ⊔ᵢ ω   = ω
 _   ⊔ᵢ _   = ω
 
 _⊔_ : level -> level -> level

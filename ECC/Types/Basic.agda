@@ -2,11 +2,11 @@
 
 module ECC.Types.Basic where
 
-open import ECC.Utilities           public
-open import ECC.Types.Level         public
+open import ECC.Utilities            public
+open import ECC.Types.Level          public
 
-open import Data.Unit using (⊤; tt) public
-open import Data.Product            public
+open import Data.Unit.Base using (⊤) public
+open import Data.Product             public
 
 infixr 2 _Π_ _≥Π_ _⟶_ _≥⟶_
 infix  1 _≤_
@@ -92,11 +92,13 @@ data _≤_ where
             {B  : ∀ x -> Type (k  x)}
         -> (∀ x -> B' x ≤ B x)
         -> A ℓΠ B' ≤ A ℓΠ B
+  -- What about (Π≤ℓΠ) and (ℓΠ≤Π)? (ᵀℕ ⟶ type 0 ≤ ᵀℕ ℓΠ type) seems OK.
   ≥Π≥Π : ∀ {α} {A : Type α} {k' k : ∀ {α'} {A' : Type α'} -> A' ≤ A -> level}
            {B' : ∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k' le)}
            {B  : ∀ {α'} {A' : Type α'} {le : A' ≤ A} -> ≤⟦ le ⟧ᵂ -> Type (k  le)}
        -> (∀ {α'} {A' : Type α'} {le : A' ≤ A} -> (x : ≤⟦ le ⟧ᵂ) -> B' x ≤ B x)
        -> A ≥Π B' ≤ A ≥Π B
+  -- What about something like ((∀ x -> B' (≤-refl x) ≤ B x) -> A ≥Π B' ≤ A Π B)?
   Σ≤Σ : ∀ {α β' β} {A : Type α}
           {B' : ᵀ⟦ A ⟧ -> Type β'}
           {B  : ᵀ⟦ A ⟧ -> Type β }
